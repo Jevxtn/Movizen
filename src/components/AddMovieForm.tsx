@@ -121,11 +121,9 @@ export const AddMovieForm = ({ onAddMovie }: AddMovieFormProps) => {
     let movieDetails: OMDbMovie | null = null;
     if (selectedMovie) {
       movieDetails = await getMovieDetails(selectedMovie.imdbID);
-    }
-
-    const newMovie: Omit<Movie, 'id'> = {
+    }    const newMovie: Omit<Movie, 'id'> = {
       title,
-      releaseDate: dateToUse,
+      releaseDate: dateToUse, // The Date object will be serialized later
       posterUrl: movieDetails?.Poster || selectedMovie?.Poster || '',
       description: movieDetails?.Plot || '',
       imdbID: movieDetails?.imdbID || selectedMovie?.imdbID || '',

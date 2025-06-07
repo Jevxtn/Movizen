@@ -14,23 +14,42 @@ export default function Home() {
   useEffect(() => {
     // This effect runs once on the client after hydration
     setIsClient(true);
-    // Load movies from localStorage if available
-    const storedMovies = localStorage.getItem('movizenMovies');
-    if (storedMovies) {
-      // Make sure to parse dates correctly
-      const parsedMovies = JSON.parse(storedMovies).map((movie: Pick<Movie, 'id' | 'title' | 'description' | 'posterUrl'> & { releaseDate: string }) => ({
-        ...movie,
-        releaseDate: new Date(movie.releaseDate),
-      }));
-      setMovies(parsedMovies);
-    }
   }, []);
+
+  useEffect(() => {
+    // Only access localStorage after the component has mounted on the client
+    if (isClient) {
+      // Load movies from localStorage if available
+      const storedMovies = localStorage.getItem('movizenMovies');
+      if (storedMovies) {
+        try {
+          // Make sure to parse dates correctly
+          const parsedMovies = JSON.parse(storedMovies).map((movie: Pick<Movie, 'id' | 'title' | 'description' | 'posterUrl'> & { releaseDate: string }) => ({
+            ...movie,
+            releaseDate: new Date(movie.releaseDate),
+          }));
+          setMovies(parsedMovies);
+        } catch (error) {
+          console.error("Failed to parse stored movies:", error);
+          // Fallback to empty array on error
+          setMovies([]);
+        }
+      }
+    }
+  }, [isClient]);
 
   useEffect(() => {
     // Save movies to localStorage whenever the movies state changes
     // This check ensures localStorage is only accessed on the client side
-    if (isClient) {
-      localStorage.setItem('movizenMovies', JSON.stringify(movies));
+    if (isClient && movies.length > 0) {
+      // Convert Date objects to ISO strings for proper serialization
+      const serializedMovies = movies.map(movie => ({
+        ...movie,
+        releaseDate: movie.releaseDate instanceof Date 
+          ? movie.releaseDate.toISOString() 
+          : movie.releaseDate
+      }));
+      localStorage.setItem('movizenMovies', JSON.stringify(serializedMovies));
     }
   }, [movies, isClient]);
 
@@ -53,7 +72,13 @@ export default function Home() {
         <AddMovieForm onAddMovie={handleAddMovie} />
         <section className="mt-8">
           <h2 className="text-2xl font-semibold mb-6 text-center sm:text-left">Upcoming Movies</h2>
-          {isClient ? <MovieList movies={movies} onRemoveMovie={handleRemoveMovie} /> : <p className="text-center">Loading movies...</p>}
+          {isClient ? <MovieList movies={movies} onRemoveMovie={handleRemoveMovie} /> : 
+            <div className="flex justify-center py-8">
+              <div className="animate-pulse text-center text-gray-600 dark:text-gray-400">
+                <p>Loading movies...</p>
+              </div>
+            </div>
+          }
         </section>
       </main>
       <footer className="text-center p-4 mt-8 bg-gray-200 dark:bg-gray-800 text-sm text-gray-600 dark:text-gray-400">

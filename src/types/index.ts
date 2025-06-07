@@ -1,7 +1,7 @@
 export interface Movie {
   id: string;
   title: string;
-  releaseDate: Date; // Use Date object for easier manipulation
+  releaseDate: Date | string; // Accept both Date object and ISO string for easier serialization
   posterUrl?: string; // Optional: URL to the movie poster
   description?: string; // Optional: A brief description or synopsis
   imdbID?: string; // OMDb API movie ID

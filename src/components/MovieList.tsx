@@ -1,4 +1,6 @@
 // src/components/MovieList.tsx
+"use client";
+
 import Image from 'next/image';
 import { Movie } from '@/types';
 
@@ -68,12 +70,10 @@ export const MovieList = ({ movies, onRemoveMovie }: MovieListProps) => {
             </h3>
             
             {/* Release Date */}
-            <div className="flex items-center mb-2">
-              <svg className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex items-center mb-2">              <svg className="h-4 w-4 text-gray-500 dark:text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {movie.releaseDate.toLocaleDateString(undefined, { 
+              </svg>              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {new Date(movie.releaseDate instanceof Date ? movie.releaseDate : movie.releaseDate).toLocaleDateString(undefined, { 
                   year: 'numeric', 
                   month: 'short', 
                   day: 'numeric' 
